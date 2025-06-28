@@ -1,20 +1,20 @@
 const express = require('express');
-const app = express();
 const mongoose = require('mongoose');
 const cors = require('cors');
+const serverless = require('serverless-http');
+
 const productRoute = require('../routes/product.route.js');
 
-// Middlewares
+const app = express();
+
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 app.use('/api/products', productRoute);
 
-// Connect DB (run only once when Vercel spins up function)
-mongoose.connect("mongodb+srv://aravindprahash19072004:Aravind1719@cluster0.czgpo5y.mongodb.net/")
-  .then(() => console.log("Connected to DB"))
-  .catch(() => console.log("DB Connection Failed"));
+// ✅ Mongoose connection
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
-// ✅ Instead of app.listen, export handler
-const serverless = require('serverless-http');
 module.exports.handler = serverless(app);
